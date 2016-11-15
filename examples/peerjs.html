@@ -1,0 +1,295 @@
+<html>
+<head>
+	<title>PeerJS - Video chat example</title>
+	<link rel="stylesheet" type="text/css" href="../css/style.css"></link>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+	<script type="text/javascript" src="../thirdparty/peer.js"></script>
+	<script src="xirsys_connect.js"></script>
+	<script src="../lib/xirsys.core.js"></script>
+	<script src="../lib/xirsys.signal.js"></script>
+	<script>
+	
+		/*
+		 * This example is a basic demonstration of how to integrate the PeerJS 
+		 * library with Xirsys services by using the Xirsys XSDK. 
+		 * 
+		 * We will show how to convert PeerJS to using Xirsys TURN and STUN servers
+		 * & how to connect users to each other very simply with Xirsys signalling.
+		 * 
+		 * In a later example we will demonstrate how to completely swap out the
+		 * node.js PeerJS-Server with Xirsys' own.
+		 *
+		 * This uses code from the PeerJS v0.3.14 repo:
+		 * https://github.com/peers/peerjs/tree/master/examples/videochat
+		 *
+		 */
+	
+		'use strict';
+		
+		// Compatibility shim
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		
+		/*
+		 * Peer ID exchange system, borrowed from the signalling demo.
+		 *
+		 */
+
+		window.onload = function () {
+			// Getting references to page DOM.
+			var peerSelection = document.getElementById("peers"),
+				loginForm = document.getElementById("login"),
+				usernameField = document.getElementById("username"),
+				username = "";
+
+			// Create a signal object.
+			var s = new $xirsys.signal((xirsysConnect.secureTokenRetrieval === true) ? xirsysConnect.server : null);
+
+			// When the connect button is clicked...
+			loginForm.onsubmit = function ($event) {
+				$event.preventDefault();
+				// Setting the peer id on the client side to avoid calls to the PeerJS server
+				username = usernameField.value.replace(/\W+/g, "");
+				if (!username || username == "") {
+					return;
+				}
+				
+				// An example of how make more likely peer ids are unique.
+				//var date = new Date(),
+				//	time = date.getTime();
+				//username = username + (time + 3);
+				
+				loginForm.style.display = 'none';
+				var connectionProperties = xirsysConnect.data;
+				connectionProperties.username = username;
+				s.connect(connectionProperties);
+				configurePeerJS();
+			}
+
+			// Peer connected helper function (UI only).
+			var addPeer = function ($peer_name) {
+				if (!!document.getElementById("peer_" + $peer_name) || $peer_name == username) {
+					return;
+				}
+				var node = document.createElement("div"),
+					btn = document.createElement("input");
+				btn.setAttribute('type', 'radio');
+				btn.setAttribute('name', 'peer');
+				btn.setAttribute('value', $peer_name);
+				node.appendChild(btn);
+				node.appendChild(document.createTextNode(stripLeaf($peer_name)));
+				peerSelection.appendChild(node);
+				node.id = "peer" + $peer_name;
+				node.className = "peer";
+			};
+
+			// Peer removal helper function (UI only).
+			var removePeer = function ($peer_name) {
+				var node = document.getElementById("peer" + $peer_name);
+				peerSelection.removeChild(node);
+			};
+
+			// Peer value helper function (UI only).
+			var selectedPeer = function () {
+				var peer = document.getElementsByName("peer");
+				console.log(peer);
+				for (var i=0, l=peer.length; i<l; i++) {
+					if (peer[i].checked) {
+						return (peer[i].value == "__all__") ? 
+							undefined : peer[i].value;
+					}
+				}
+			};
+
+			var stripLeaf = function (p) {
+				 return p.substr(p.lastIndexOf("/")+1)
+			};
+
+			// When a peer connects to signalling, we
+			// get notified here.
+			$xirsys.events.getInstance().on($xirsys.signal.peerConnected, function ($evt, $msg) {
+				addPeer($msg);
+			});
+			
+			// When a peer leaves (disconnects) from
+			// the signalling, we get notified here.
+			$xirsys.events.getInstance().on($xirsys.signal.peerRemoved, function ($evt, $peer) {
+				removePeer($peer);
+			});
+			
+			// We get this when we login. There may be zero
+			// to many peers at this time.
+			$xirsys.events.getInstance().on($xirsys.signal.peers, function ($evt, $msg) {
+				for (var i = 0; i < $msg.users.length; i++) {
+					addPeer($msg.users[i]);
+				}
+			});
+
+			$xirsys.events.getInstance().on($xirsys.signal.error, function ($evt, $msg) {
+				console.error("error: ", $msg);
+			});
+			
+			var configurePeerJS = function() {
+
+				// This object will take in an array of XirSys STUN / TURN servers
+				// and override the original config object
+				var customConfig;
+			
+				// Call XirSys ICE servers
+				$.ajax({
+					url: $xirsys.baseUrl + 'ice',
+					data: xirsysConnect.data,
+					success: function (data, status) {
+						customConfig = data.d; // data.d contains the iceServers object
+						console.log(customConfig);
+					},
+					async: false
+				});
+				
+				// PeerJS object
+				var peer = new Peer(username, {
+					key: 'sl8vk0fnzasb57b9', // Replace key: http://peerjs.com/peerserver
+					debug: 3,
+					config: customConfig
+				});
+				//var peer = new Peer({ key: 'lwjd5qra8257b9', debug: 3});
+
+				// We have adapted the make call function to use the id passed
+				// by the Xirsys signalling demo above.				
+				$(function(){
+					$('#make-call').click(function(){
+						// Initiate a call!
+						var peerToCall = selectedPeer();
+						if (!!peerToCall) {
+							var call = peer.call(selectedPeer(), window.localStream);
+							step3(call);
+						} else {
+							alert('Please select a peer first');
+						}
+					});
+
+					$('#end-call').click(function(){
+						window.existingCall.close();
+						step2();
+					});
+
+					// Retry if getUserMedia fails
+					$('#step1-retry').click(function(){
+						$('#step1-error').hide();
+						step1();
+					});
+
+					// Get things started
+					step1();
+				});
+				
+				/*
+				 * Code that follows is unchanged from the PeerJS v0.3.14 repo:
+				 * https://github.com/peers/peerjs/tree/master/examples/videochat
+				 *
+				 */
+				 
+				peer.on('open', function(){
+					$('#my-id').text(peer.id);
+				});
+
+				// Receiving a call
+				peer.on('call', function(call){
+					console.log(call);
+					// Answer the call automatically (instead of prompting user) for demo purposes
+					call.answer(window.localStream);
+					step3(call);
+				});
+				peer.on('error', function(err){
+					alert(err.message);
+					// Return to step 2 if error occurs
+					step2();
+				});
+
+				function step1 () {
+					// Get audio/video stream
+					navigator.getUserMedia({audio: true, video: true}, function(stream){
+						// Set your video displays
+						$('#my-video').prop('src', URL.createObjectURL(stream));
+
+						window.localStream = stream;
+						step2();
+					}, function(){ $('#step1-error').show(); });
+				}
+
+				function step2 () {
+					$('#step1, #step3').hide();
+					$('#step2').show();
+				}
+
+				function step3 (call) {
+					// Hang up on an existing call if present
+					if (window.existingCall) {
+						window.existingCall.close();
+					}
+
+					// Wait for stream on the call, then set peer video display
+					call.on('stream', function(stream){
+						$('#their-video').prop('src', URL.createObjectURL(stream));
+					});
+
+					// UI stuff
+					window.existingCall = call;
+					$('#their-id').text(call.peer);
+					call.on('close', step2);
+					$('#step1, #step2').hide();
+					$('#step3').show();
+				}
+			}
+		}
+
+	</script>
+
+
+</head>
+
+<body>
+
+
+	<h1>PeerJS and Xirsys Video Chat Demo</h1>
+	<p>This is an example of Xirsys working with PeerJS. As such, this demo is not intended to be an example of an end user application.</p>
+	
+	<section>
+		<form id="login" class="box">
+			Username: <input type="text" id="username" placeholder="enter a username" />
+			<button id="login-btn" type="submit">connect</button>
+		</form>
+		<div id="step1" class="box">
+			<p>Please choose a username then click 'allow' on the top of the screen so we can access your webcam and microphone for calls.</p>
+			<div id="step1-error" class="hidden">
+				<p>Failed to access the webcam and microphone. Make sure to run this demo on an http server and click allow when asked for permission by the browser.</p>
+				<a href="#" class="pure-button pure-button-error" id="step1-retry">Try again</a>
+			</div>
+		</div>
+		<div id="step2" class="box hidden">
+			<h2>Your id: <span id="my-id">...</span></h2>
+			<div id="peers">
+				<h2>Peers to call:</h2>
+				<div class="peer">
+				</div> 
+			</div>
+			<button id="make-call">Call peer</button>
+		</div>
+		<div id="step3" class="box hidden">
+			<p>Currently in call with <span id="their-id">...</span></p>
+			<button id="end-call">End call</button>
+		</div>
+		<div id="lVideo" class="video-container box">
+			<h2>Local Video</h2>
+			<video id="my-video" muted="true" autoplay></video>
+		</div>
+	</section>
+	<section>
+		<div id="rVideo" class="video-container box">
+			<h2>Remote Video</h2>
+			<video id="their-video" autoplay></video>
+		</div>
+	</section>
+
+
+</body>
+</html>
