@@ -45,6 +45,12 @@
 					s.close();
 					login_btn.childNodes[0].nodeValue = "connect";
 					state = 0;
+					var peer = document.getElementsByName("peer");
+					for (var i=0, l=peer.length; i<l; i++) {
+						if (peer[i].value != "__all__") { 
+							removePeer(peer[i].value);
+						}
+					}
 				}
 			}
 
@@ -124,6 +130,8 @@
 				console.error("error: ", $msg);
 			});
 
+
+	
 			// Here, we do something when the send button
 			// is clicked.
 			sendMessage.onsubmit = function ($event) {
