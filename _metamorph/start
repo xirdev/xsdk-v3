@@ -1,0 +1,12 @@
+#!/bin/bash
+# export PATH=/elixir/bin:$PATH
+# export LC_ALL=en_US.UTF-8
+# export LANG=en_US.UTF-8
+# export LANGUAGE=en_US.UTF-8
+# export HOME=/user
+
+
+cd /user/cells/xs3-sdk
+
+#http-server -S -C /star_xirsys_com.pem -K /star_xirsys_com.key -p 10002
+http-server -p 10002
