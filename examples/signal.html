@@ -60,13 +60,14 @@
 				node.appendChild(btn);
 				node.appendChild(document.createTextNode(stripLeaf($peer_name)));
 				peers.appendChild(node);
-				node.id = "peer" + $peer_name;
+				node.id = "peer_" + $peer_name;
 				node.className = "peer";
 			};
 
 			// Peer removal helper function (UI only).
 			var removePeer = function ($peer_name) {
-				var node = document.getElementById("peer" + $peer_name);
+				console.log("remoig "+$peer_name)
+				var node = document.getElementById("peer_" + $peer_name);
 				peers.removeChild(node);
 			};
 
