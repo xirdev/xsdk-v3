@@ -130,10 +130,8 @@
 				var peer = selectedPeer();
 				addMessage(name + ": " + message.value);
 				if (!!peer) {
-					console.log(peer);
 					s.send("message", message.value, peer);
 				} else {
-					console.log('no peer');
 					s.send("message", message.value);
 				}
 				message.value = '';
