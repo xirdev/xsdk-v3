@@ -176,6 +176,80 @@ body {
 	cursor: hand;
 }
 
+.sign-out {
+	background-image: url('../images/sign-out.png');
+	background-repeat: no-repeat;
+}
+
+.sign-out-grn {
+	background-image: url('../images/sign-out-grn.png');
+	background-repeat: no-repeat;
+}
+
+.user-icon-img {
+	width: 17px;
+	height: 17px;
+	background-image: url('../images/user-icon-sm.png');
+	background-repeat: no-repeat;
+}
+
+.user-icon-img-grn {
+	width: 17px;
+	height: 17px;
+	background-image: url('../images/user-icon-sm-grn.png');
+	background-repeat: no-repeat;
+}
+
+.start-call {
+	background-image: url('../images/start-call.png');
+	background-repeat: no-repeat;
+}
+
+.start-call-grn {
+	background-image: url('../images/start-call-grn.png');
+	background-repeat: no-repeat;
+}
+
+.end-call {
+	background-image: url('../images/end-call.png');
+	background-repeat: no-repeat;
+}
+
+.end-call-grn {
+	background-image: url('../images/end-call-grn.png');
+	background-repeat: no-repeat;
+}
+
+.end-call-wt {
+	background-image: url('../images/end-call-wt.png');
+	background-repeat: no-repeat;
+}
+
+.remote-fs-selected {
+	background-color: #81b75c;
+	background-repeat: no-repeat;
+}
+
+.remote-fs-unselected {
+	background-color: #797979;
+	background-repeat: no-repeat;
+}
+
+.expand {
+	background-image: url('../images/expand.png');
+	background-repeat: no-repeat;
+}
+
+.chat-on {
+	background-image: url('../images/chat-on.png');
+	background-repeat: no-repeat;
+}
+
+.brand-logo {
+	background-image: url('../images/brand-logo.png');
+	background-repeat: no-repeat;
+}
+
 section.vertical-bar {
 	width: 270px;
 	/*background-color: #F5F5F5;*/

@@ -130,7 +130,7 @@
 				//if in chat. not allowed.
 				if(!!remoteChatRequest.peer){
 					//todo - check if peer exists, then check if chat is open if not open it and tell them error.
-					addMessage('ERROR',{internal:true,type:'msg-alert',message:'Only a one on one peer conversations are currently allowed. Please end this call to chat with another user.'});
+					addMessage('ERROR',{internal:true,type:'msg-alert',message:'Only a one-on-one peer conversation is currently allowed. Please end this call to chat with another user.'});
 					if(!chatOn) showChat(true);
 					return;
 				}
