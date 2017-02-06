@@ -5,12 +5,9 @@
 var xirsysConnect = {
 	secureTokenRetrieval : false,
 	data : {
-		domain : 'www.xirsys.com',
-		application : 'default',
-		room : 'default',
-		ident : 'jerzilla',
-		secret : '1d484d60-6af4-11e6-b627-ba45bfd7b2b0',
-		secure : 1
+		channel : 'www.xirsys.com',
+		ident : 'LeeSylvester',
+		secret : '84ddc270-c62a-11e6-9f07-2507c0291f3c'
 	}
 };
 
