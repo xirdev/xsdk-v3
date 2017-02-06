@@ -534,7 +534,7 @@
 				peerInfoView.style.visibility = 'hidden';
 				videoMenu.style.visibility = 'hidden';
 				//if its a denial, do not send messages.
-				if(!$denied){
+				if($denied === false){
 			        sendMsg({internal:true,type:'action',code:'rtc.p2p.close',peer:username}, remoteChatRequest.peer);
 			        addMessage('INFO',{internal:true,type:'msg-info',message:'Your chat with '+remoteChatRequest.peer+' has endeed.'});
 			    }
@@ -545,8 +545,8 @@
 				}
 		    };
 
-		    var callDenied = function( $event, $msg ){
-		    	if($msg.code === 'user.insession'){
+		    var callDenied = function( $event, $peer, $data ){
+		    	if($data.code === 'user.insession'){
 		    		var peer = remoteChatRequest.peer;
 		    		callEnd($event, true);
 					addMessage('ERROR',{internal:true,type:'msg-alert',message:peer+' is currently in a session, please try again later.'});
@@ -595,9 +595,8 @@
     		
     		events.on($xirsys.p2p.iceDisconnected, function ($evt) {callEnd($evt);});
 
-    		events.on($xirsys.p2p.requestDenied, function ($evt, $msg) {
-    			console.log('requestDenied !!!!!');
-    			callDenied($evt, $msg);
+    		events.on($xirsys.p2p.requestDenied, function ($evt, $peer, $data) {
+    			callDenied($evt, $peer, $data);
     		});
 
 			// Log errors in the terminal.
