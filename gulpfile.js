@@ -11,7 +11,7 @@ gulp.task('xsdk', function() {
     return gulp.src(jsFiles)
         .pipe(concat('xsdk.js'))
         .pipe(gulp.dest(jsDest))
-        .pipe(rename('xsdk.js'))
-        .pipe(uglify())
-        .pipe(gulp.dest(jsDest))
+        // .pipe(rename('xsdk.js'))
+        // .pipe(uglify())
+        // .pipe(gulp.dest(jsDest))
 });
