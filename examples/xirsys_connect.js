@@ -3,12 +3,14 @@
 
 // Insecure method
 var xirsysConnect = {
-	secureTokenRetrieval : false,
-	data : {
-		channel : 'www.xirsys.com',
-		ident : 'LeeSylvester',
-		secret : '84ddc270-c62a-11e6-9f07-2507c0291f3c'
-	}
+    secureTokenRetrieval: false,
+    data: {
+        channel: 'www.xirsys.com',
+        ident: 'demouser',
+        secret: 'secret',
+        secure: 1
+
+    }
 };
 
 // Secure method
@@ -22,4 +24,3 @@ var xirsysConnect = {
 		secure : 1
 	}
 };*/
-
