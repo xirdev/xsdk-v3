@@ -1,4 +1,5 @@
 .task-pachpict/
 _xirsys_connect.js
 examples/_xirsys_connect.js
+node_modules/
 
