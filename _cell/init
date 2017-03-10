@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Hang on, doing an npm install ..."
+npm install

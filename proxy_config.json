@@ -1,0 +1,10 @@
+{
+    "ident": "demouser",
+    "secret": "secret",
+    "gateway": "NEURON",
+    "port": 10002,
+    "protocol": "http",
+    "key_file": "mykeyfile.key",
+    "cert_file": "mycertfile.pem"
+
+}
