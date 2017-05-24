@@ -1,3 +1,11 @@
+***
+```
+DEPRECATED
+
+Use https://github.com/xirsys/xirsys-examples-v3/
+```
+***
+
 xsdk
 ====
 
